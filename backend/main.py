@@ -430,14 +430,37 @@ async def delete_task(
 
 # ============== Static Files (Frontend) ==============
 
-# Check if frontend dist exists and serve it
-frontend_dist = os.path.join(os.path.dirname(__file__), "..", "dist")
-if os.path.exists(frontend_dist):
-    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+# Check multiple possible locations for frontend dist
+possible_paths = [
+    os.path.join(os.path.dirname(__file__), "dist"),  # backend/dist
+    os.path.join(os.path.dirname(__file__), "..", "dist"),  # ../dist (dev)
+    "/opt/render/project/src/dist",  # Render default path
+]
+
+frontend_dist = None
+for path in possible_paths:
+    if os.path.exists(path) and os.path.isdir(path):
+        frontend_dist = path
+        break
+
+if frontend_dist:
+    assets_path = os.path.join(frontend_dist, "assets")
+    if os.path.exists(assets_path):
+        app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
+    
+    # Mount other static files (icons, manifest, etc.)
+    for static_file in ["favicon.svg", "pwa-192x192.svg", "pwa-512x512.svg", "apple-touch-icon.svg", "manifest.webmanifest", "registerSW.js", "sw.js"]:
+        static_path = os.path.join(frontend_dist, static_file)
+        if os.path.exists(static_path):
+            @app.get(f"/{static_file}")
+            async def serve_static(file=static_path):
+                return FileResponse(file)
     
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
         """Serve frontend for all non-API routes."""
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="Not Found")
         file_path = os.path.join(frontend_dist, full_path)
         if os.path.exists(file_path) and os.path.isfile(file_path):
             return FileResponse(file_path)
