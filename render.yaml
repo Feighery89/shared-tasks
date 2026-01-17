@@ -1,0 +1,27 @@
+# Render Blueprint for Shared Tasks
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: shared-tasks
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shared-tasks-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://shared-tasks.onrender.com
+    healthCheckPath: /api/users/me
+    autoDeploy: true
+
+databases:
+  - name: shared-tasks-db
+    plan: free
+    databaseName: shared_tasks
+    user: shared_tasks_user
