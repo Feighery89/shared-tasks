@@ -1,0 +1,165 @@
+{
+  "title": "Shared Tasks",
+  "description": "Simple shared task management for couples. No projects, no priorities, no labels. Just tasks, a shared list, and visibility into what's getting done.",
+  "repoPath": "/Users/markfeighery/AI_Projects/active/shared-tasks",
+  "generatedAt": "2026-01-29 21:10",
+  "stack": {
+    "languages": [
+      "TypeScript",
+      "Python"
+    ],
+    "frameworks": [
+      "React",
+      "FastAPI",
+      "Tailwind CSS",
+      "Vite"
+    ],
+    "tools": [
+      "Render",
+      "PostgreSQL",
+      "PWA"
+    ]
+  },
+  "overview": [
+    "Shared task list for couples - add tasks, claim them, mark done, see who did what.",
+    "Magic link auth (passwordless) - enter email, click link, you're in.",
+    "Household pairing via 6-character invite code - partner joins your shared list.",
+    "Done Feed shows completed tasks from last 7 days with attribution.",
+    "PWA-ready - add to home screen for native app experience.",
+    "Deployed on Render with PostgreSQL backend."
+  ],
+  "entrypoints": [
+    {
+      "path": "src/main.tsx",
+      "note": "React app bootstrap - mounts App to DOM"
+    },
+    {
+      "path": "src/App.tsx",
+      "note": "Root component - auth flow, tab navigation, task/done views"
+    },
+    {
+      "path": "backend/main.py",
+      "note": "FastAPI server - all API routes, CORS, static file serving"
+    }
+  ],
+  "commands": [
+    {
+      "command": "npm run dev:all",
+      "note": "Start both frontend (Vite) and backend (uvicorn) together"
+    },
+    {
+      "command": "npm run dev",
+      "note": "Frontend only - Vite dev server on :5173"
+    },
+    {
+      "command": "npm run dev:backend",
+      "note": "Backend only - uvicorn on :8000"
+    },
+    {
+      "command": "npm run build",
+      "note": "Production build - TypeScript check + Vite bundle"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "react",
+      "group": "Frontend Core"
+    },
+    {
+      "name": "react-dom",
+      "group": "Frontend Core"
+    },
+    {
+      "name": "tailwindcss",
+      "group": "Frontend Styling"
+    },
+    {
+      "name": "vite",
+      "group": "Frontend Build"
+    },
+    {
+      "name": "vite-plugin-pwa",
+      "group": "PWA Support"
+    },
+    {
+      "name": "fastapi",
+      "group": "Backend Framework"
+    },
+    {
+      "name": "sqlalchemy",
+      "group": "Backend ORM"
+    },
+    {
+      "name": "pyjwt",
+      "group": "Backend Auth"
+    },
+    {
+      "name": "uvicorn",
+      "group": "Backend Server"
+    },
+    {
+      "name": "psycopg2-binary",
+      "group": "Backend Database"
+    }
+  ],
+  "keyFiles": [
+    {
+      "path": "README.md",
+      "note": "Setup guide, API docs, deployment instructions"
+    },
+    {
+      "path": "render.yaml",
+      "note": "Render Blueprint - one-click deploy config"
+    },
+    {
+      "path": "backend/main.py",
+      "note": "All API routes: auth, users, households, tasks"
+    },
+    {
+      "path": "backend/models.py",
+      "note": "SQLAlchemy models: User, Household, Task"
+    },
+    {
+      "path": "src/lib/api.ts",
+      "note": "API client - all frontend-to-backend calls"
+    },
+    {
+      "path": "src/App.tsx",
+      "note": "Main UI - auth gates, tab nav, state management"
+    }
+  ],
+  "files": [
+    "src/main.tsx",
+    "src/App.tsx",
+    "src/index.css",
+    "src/lib/api.ts",
+    "src/types/index.ts",
+    "src/components/AuthForm.tsx",
+    "src/components/HouseholdSetup.tsx",
+    "src/components/TaskList.tsx",
+    "src/components/TaskCard.tsx",
+    "src/components/AddTask.tsx",
+    "src/components/DoneFeed.tsx",
+    "src/components/PartnerInvite.tsx",
+    "src/hooks/useAuth.ts",
+    "src/hooks/useHousehold.ts",
+    "src/hooks/useTasks.ts",
+    "backend/main.py",
+    "backend/models.py",
+    "backend/schemas.py",
+    "backend/database.py",
+    "backend/auth.py",
+    "backend/requirements.txt",
+    "package.json",
+    "vite.config.ts",
+    "render.yaml",
+    "README.md"
+  ],
+  "diagrams": {
+    "architecture": "graph TD\n    subgraph Frontend[\"Frontend - React + Vite\"]\n        App[App.tsx]\n        Auth[AuthForm]\n        Setup[HouseholdSetup]\n        Tasks[TaskList]\n        Done[DoneFeed]\n        API[api.ts Client]\n        App --> Auth\n        App --> Setup\n        App --> Tasks\n        App --> Done\n        Auth --> API\n        Setup --> API\n        Tasks --> API\n        Done --> API\n    end\n\n    subgraph Backend[\"Backend - FastAPI\"]\n        Routes[main.py Routes]\n        AuthMod[auth.py]\n        Models[models.py]\n        Routes --> AuthMod\n        Routes --> Models\n    end\n\n    subgraph Data[\"Data Layer\"]\n        DB[(PostgreSQL)]\n        Models --> DB\n    end\n\n    API -->|HTTP/JSON| Routes\n    \n    subgraph Deploy[\"Deployment - Render\"]\n        Web[Web Service]\n        PG[Managed Postgres]\n        Web --> PG\n    end",
+    "dataFlow": "graph LR\n    subgraph Auth Flow\n        A1[User enters email] --> A2[POST /auth/magic-link]\n        A2 --> A3[Magic token generated]\n        A3 --> A4[User clicks link with token]\n        A4 --> A5[POST /auth/verify]\n        A5 --> A6[JWT returned]\n        A6 --> A7[Stored in localStorage]\n    end",
+    "taskFlow": "graph LR\n    subgraph Task Lifecycle\n        T1[Add Task] -->|POST /tasks| T2[Task Created - unclaimed]\n        T2 -->|POST /tasks/id/claim| T3[Task Claimed]\n        T3 -->|POST /tasks/id/complete| T4[Task Completed]\n        T4 --> T5[Appears in Done Feed]\n    end",
+    "householdFlow": "graph LR\n    subgraph Household Pairing\n        H1[User A creates household] --> H2[Gets 6-char invite code]\n        H2 --> H3[Shares code with User B]\n        H3 --> H4[User B joins with code]\n        H4 --> H5[Both see same task list]\n    end",
+    "entityRelationship": "erDiagram\n    HOUSEHOLD ||--o{ USER : has_members\n    HOUSEHOLD ||--o{ TASK : contains\n    USER ||--o{ TASK : creates\n    USER ||--o{ TASK : claims\n    USER ||--o{ TASK : completes\n\n    HOUSEHOLD {\n        string id PK\n        string name\n        string invite_code UK\n        datetime created_at\n    }\n\n    USER {\n        string id PK\n        string email UK\n        string name\n        string avatar_color\n        string household_id FK\n        string magic_token\n        datetime magic_token_expires\n    }\n\n    TASK {\n        string id PK\n        string household_id FK\n        string title\n        string claimed_by FK\n        string completed_by FK\n        datetime completed_at\n        string created_by FK\n        datetime created_at\n    }"
+  }
+}
